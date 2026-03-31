@@ -25,4 +25,4 @@ Este proyecto integra desde el diseño de interfaces modernas hasta la gestión 
 
 1. **Clonar el repositorio:**
    ```bash
-   git clone [https://github.com/DiegoA-ValderramaG/Chess.io.git](https://github.com/DiegoA-ValderramaG/Chess.io.git)
+   git clone [https://github.com/DiegoA-ValderramaG/Chessito.git](https://github.com/DiegoA-ValderramaG/Chessito.git)
