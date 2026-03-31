@@ -1,6 +1,6 @@
 # Chessito ♟️
 
-Chess.io es una plataforma de ajedrez Fullstack diseñada para ofrecer partidas en tiempo real con una arquitectura sólida y escalable. 
+Chessito es una plataforma de ajedrez Fullstack diseñada para ofrecer partidas en tiempo real con una arquitectura sólida y escalable. 
 Este proyecto integra desde el diseño de interfaces modernas hasta la gestión de bases de datos relacionales y comunicación bidireccional.
 
 ## 🚀 Tecnologías y Herramientas
