@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chessito</title>
+    <link rel="stylesheet" href="/public/css/main.css">
+</head>
+<body>
+    <div class="container">
+        <div class="logo">♟️Chessito</div>
+        <h1>Bienvenido a Chessito</h1>
+        <p>¡Juega al ajedrez en línea con amigos y jugadores de todo el mundo!</p>
+
+        <span>Bienvenido, <span id="username"></span>
+        <br>
+
+        <div id="error" class="error"></div>
+
+        <div>
+            <button onclick="createGame()" class="create-game-btn">Jugar Ahora</button>
+            <div class="divider">or</div>
+            <div>
+                <input type="text" id="gameIdInput" placeholder="ID de la Partida">
+            <button onclick="joinGame()" class="create-game-btn">Unirse a una Partida</button>
+            </div>
+        </div>
+
+
+
+        <a href="/front/views/login.html" class="btn">Iniciar Sesión</a>
+        <br>
+        <a href="/front/views/register.html" class="btn">Registrarse</a>
+
+        <br>
+        <button onclick="logout()" class="create-game-btn">Cerrar Sesión</button>
+        <br>
+    
+        <div id="gameCodeDisplay" class="game-code-display">
+            <div>Codigo de Juego: </div>
+            <div id="gameCode" class="game-code"></div>
+            <button onclick="copyGameCode()" class="create-game-btn">Copiar Código</button>
+        </div>
+    </div>
+    <script>
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/auth/me'); 
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('username').textContent = data.user.username;
+                } 
+            } catch (err) {
+                    console.error('Error al obtener el usuario:', err);
+                }
+        });
+    
+        async function logout() {
+            try {
+                const response = await fetch('/auth/logout', {
+                    method: 'POST',
+                });
+                const data = await response.json();
+                if (data.success) {
+                    window.location.href = '/login';
+                } else {
+                    showError('Error al cerrar sesión');
+                }
+            } catch (err) {
+                console.error('Error al cerrar sesión:');
+            }
+        }
+         function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.textContent = '';
+            }, 5000);
+        }
+        // function de Codigo Aleatorio de juego
+        function generateGameCode() {
+            return Math.random().toString(36).substr(2, 8).toUpperCase();
+        }
+        // Función para crear una nueva partida
+        async function createGame() {
+            const gameCode = generateGameCode();
+            try {
+                const response = await fetch('/game/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ gameCode: gameCode, timeControl: 10 })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    winmdow.location.href = `/game/${data.gameCode}`;
+                    document.getElementById('gameCode').textContent = data.gameCode;
+                    document.getElementById('gameCodeDisplay').style.display = 'block';
+                } else {
+                    showError(data.message || 'Error al crear la partida');
+                } 
+            } catch (err) {
+                    showError('Error al crear la partida');
+                }
+            }
+            // Función para unirse a una partida existente
+        async function joinGame() {
+            const gameCode = document.getElementById('gameIdInput').value.trim().toUpperCase();
+            if (!gameCode) {
+                showError('Por favor, ingresa un ID de partida válido');
+                return;
+            }
+            try {
+                const response = await fetch('/game/join', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ gameCode: gameCode })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    window.location.href = `/game/${gameCode}`;
+                } else {
+                    showError(data.message || 'Error al unirse a la partida');
+                }
+                } catch (err) {
+                        showError('Error al unirse a la partida');
+            }
+        }
+
+        // Función para copiar el código de la partida al portapapeles
+        function copyGameCode() {
+            const gameCode = document.getElementById('gameCode').textContent;
+            navigator.clipboard.writeText(gameCode).then(() => {
+                const copyButton = document.querySelector('.copy-button');
+                const originalText = copyButton.textContent;
+                copyButton.textContent = '¡Copiado!';
+                setTimeout(() => {
+                    copyButton.textContent = originalText;
+                }, 2000);
+                showError('Código de juego copiado al portapapeles');
+            }).catch(err => {
+                console.error('Error al copiar el código de juego:', err);
+                showError('Error al copiar el código de juego:');
+            });
+        }
+        // verificar errores de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+        if (error) {
+            showError(
+                error === 'noCode' ? 'Por favor, ingresa un ID de partida' :
+                error === 'Partida no encontrada' ? 'Partida no encontrada' : 
+                error === 'Codigo invalido' ? 'ID de partida invalido' :
+                error === 'Partida llena' ? 'Partida llena' :
+                'Error uniendose a la partida'
+            );
+        }
+    </script>
+</body>
+</html>

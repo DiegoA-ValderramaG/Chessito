@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Chessito</title>
+    <link rel="stylesheet" href="/public/css/main.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="logo">♟️</div>
+        <h1 class="logo">Registrate-Chessito</h1>
+        <div id="errorMessage" class="error-message"></div>
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
+            </div>
+            <button type="submit" class="button">Register</button>
+        </form>
+        <div class="register-link">
+            <p>Already have an account? <a href="./login.html">Login</a></p>
+        </div>
+    </div>
+    <script>
+        const form =document.getElementById('registerForm');
+        const errorMessage = document.getElementById('errorMessage');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                errorMessage.textContent = 'Passwords do not match';
+                return;
+            }
+
+            try {
+                const response = await fetch('/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        username: username, 
+                        email: email,
+                        password: password 
+                    })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    window.location.href = '/login';
+                } else {
+                    errorMessage.textContent = data.message || 'Error registering';
+                    errorMessage.style.display = 'block';
+                }
+            } catch (err) {
+                console.error('Error registering:', err);
+                errorMessage.textContent = 'Error registering';
+            }
+        });
+
+    </script>
+</body>
+</html>
