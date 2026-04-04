@@ -126,16 +126,78 @@ router.post('/login', async (req, res) => {
         res.json({
             success: true,
             user: {
-                id: user.id
-            }
+                id: user.id,
+                username: user.username,
+                email: user.email
+            },
+            message: 'Login successful'
         });
     } catch (error) {
-        console.error('Error logging in:', error.message);
+        console.error('Error logging in:', {
+            error: error.message,
+            code: error.code,
+            detail: error.detail,
+            table: error.table,
+            constraint: error.constraint
+        });
         res.status(500).json({
             success: false,
-            message: 'Login failed'
+            message: 'Error logging in. Please try again later.'
         });
     }
+});
+
+// logout user
+router.post('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            console.error('Error logging out:', err);
+            return res.status(500).json({
+                success: false,
+                message: 'Error logging out. Please try again later.'
+            });
+        } 
+            console.log('Logout successful');
+            res.json({
+                success: true,
+                message: 'Logout successful'
+            });
+    });
+});
+
+// get current user
+router.get('/me', async (req, res) => {
+    if (!req.session.userId) {
+        return res.status(401).json({
+            success: false,
+            message: 'Unauthorized'
+        });
+    }
+    try {
+        const result = await db.query(
+            'SELECT id, username, email FROM users WHERE id = $1',
+            [req.session.userId]
+        );
+        if (!result.rows[0]) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            user: result.rows[0]
+        });
+
+            } catch (error) {
+                console.error('Error fetching user:', error);
+                res.status(500).json({
+                    success: false,
+                    message: 'Error fetching user. Please try again later.'
+                });
+            }
+
 });
 
 module.exports = router;
