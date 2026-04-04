@@ -98,9 +98,9 @@ router.post('/login', async (req, res) => {
         if (!user) {
             console.log('Error: User not found');
             return res.status(400).json({
-                seccess: false,
+                success: false,
                 message: 'Invalid username or password'
-            })
+            });
         }
 
         // verify password
@@ -128,7 +128,13 @@ router.post('/login', async (req, res) => {
             user: {
                 id: user.id
             }
-        })
+        });
+    } catch (error) {
+        console.error('Error logging in:', error.message);
+        res.status(500).json({
+            success: false,
+            message: 'Login failed'
+        });
     }
 });
 
