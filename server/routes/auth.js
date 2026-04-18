@@ -38,7 +38,7 @@ router.post('/register', async (req, res) => {
         // Insert new user into database
         console.log('Inserting new user into database...');
         const result = await db.query(
-            'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id',
+            'INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id',
             [username, email, hashedPassword]
         );
         console.log('User inserted with ID:', result.rows[0].id);
