@@ -1,6 +1,6 @@
 -- creacion de tablas de usuarios 
 
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
 id SERIAL PRIMARY KEY,
 username VARCHAR (50) UNIQUE NOT NULL,
 email VARCHAR (255) UNIQUE NOT NULL,
@@ -10,11 +10,11 @@ last_login TIMESTAMP WITH TIME ZONE
 );
 
 -- creacion de tablas de sesion para conectarlas a pg-simple
-CREATE TABLE session (
+CREATE TABLE IF NOT EXISTS session (
 sid varchar NOT NULL COLLATE "default",
 sess json NOT NULL,
 expire timestamp(6) NOT NULL,
 CONSTRAINT session_pkey PRIMARY KEY (sid)
 );
 
-CREATE INDEX IDX_session_expire ON session (expire);
+CREATE INDEX IF NOT EXISTS IDX_session_expire ON session (expire);

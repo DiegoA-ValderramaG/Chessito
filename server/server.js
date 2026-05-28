@@ -93,7 +93,7 @@ myIo(io);
 app.use((err, req, res, next) => {
     console.error('Server error', err);
     res.status(500).json({ 
-        sucess: false,
+        success: false,
         message: 'Internal Server Error'
     });
 });
