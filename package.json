@@ -20,7 +20,8 @@
     "express-handlebars": "^8.0.2",
     "express-session": "^1.19.0",
     "install": "^0.13.0",
-    "pg": "^8.20.0",
+    "pg": "^8.21.0",
+    "pg-hstore": "^2.3.4",
     "socket.io": "^4.8.3"
   },
   "devDependencies": {
