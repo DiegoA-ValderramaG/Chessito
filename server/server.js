@@ -3,22 +3,24 @@ const express = require('express');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
-const http = require('http'),
-    session = require('express-session'),
-    pgSession = require('connect-pg-simple')(session),
-    socketIo = require('socket.io');
+const http = require('http');
+const session = require('express-session');
+const pgSession = require('connect-pg-simple')(session);
+const socketIo = require('socket.io');
 
 const config = require('../config');
 const pool = require('./database/db');
 const { requireAuth, setUserData } = require('./middleware/auth');
 const authRoutes = require('./routes/auth');
 
-const myIo = require('./sockets/io'),
-      routes = require('./routes/routes');
+const myIo = require('./sockets/io');
+const routes = require('./routes/routes');
+
+const isVercel = process.env.VERCEL === '1' || process.env.VERCEL === 'true';
 
 const app = express();
-      server = http.Server(app),
-      io = socketIo(server);
+const server = isVercel ? null : http.Server(app);
+const io = isVercel ? null : socketIo(server);
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -87,7 +89,9 @@ app.get('/', requireAuth, (req, res) => {
 app.use('/game', requireAuth, routes);
 
 // Socket.io configuration
-myIo(io);
+if (!isVercel) {
+    myIo(io);
+}
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -100,6 +104,11 @@ app.use((err, req, res, next) => {
 
 // Port Settings and server start
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+if (!isVercel) {
+    server.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+}
+
+module.exports = app;
+
