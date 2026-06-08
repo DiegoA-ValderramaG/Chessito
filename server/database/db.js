@@ -3,7 +3,12 @@ const path = require('path');
 const { Pool } = require('pg');
 require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 
-const dbConfig = {
+const connectionString = process.env.DATABASE_URL;
+
+const dbConfig = connectionString ? {
+    connectionString,
+    ssl: { rejectUnauthorized: false }
+} : {
     user: process.env.DB_USER,
     host: process.env.DB_HOST,
     database: process.env.DB_NAME,
@@ -11,12 +16,16 @@ const dbConfig = {
     port: process.env.DB_PORT,
 };
 
-console.log('Database configuration:', {
-    user: dbConfig.user,
-    host: dbConfig.host,
-    database: dbConfig.database,
-    port: dbConfig.port,
-});
+if (connectionString) {
+    console.log('Using DATABASE_URL for Postgres connection');
+} else {
+    console.log('Database configuration:', {
+        user: dbConfig.user,
+        host: dbConfig.host,
+        database: dbConfig.database,
+        port: dbConfig.port,
+    });
+}
 
 const pool = new Pool(dbConfig);
 
